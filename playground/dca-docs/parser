@@ -130,7 +130,7 @@ class Parser
 			// Add the top levels comments
 			if ($intIndent == 1)
 			{
-				$strBuffer .= $this->generateIndent($intIndent) . '<span class="comment">// ' . ucfirst($k) . '</span><br>';
+				$strBuffer .= $this->generateIndent($intIndent) . '<span class="comment">// ' . ucfirst($k) . '</span><br>' . "\n";
 			}
 
 			$trail = array_merge($arrTrail, array($k));
@@ -170,7 +170,7 @@ class Parser
 				if ($k && (count(array_filter(array_keys($v), 'is_string')) > 0 || in_array($k, $this->arrPreserveArrays)))
 				{
 					$strBuffer .= '<br>';
-					$strBuffer .= $this->generateIndent($intIndent) . '(<br>';
+					$strBuffer .= $this->generateIndent($intIndent) . '(<br>' . "\n";
 					$strBuffer .= $this->generateMarkup($v, ($intIndent + 1), $trail);
 					$strBuffer .= $this->generateIndent($intIndent) . ')';
 				}
@@ -181,15 +181,13 @@ class Parser
 				}
 			}
 
-			$strBuffer .= ((++$count == $total) ? '' : ',') . '<br>';
+			$strBuffer .= ((++$count == $total) ? '' : ',') . '<br>' . "\n";
 
 			// Separate the main sections
 			if ($intIndent == 1)
 			{
-				$strBuffer .= '<br>';
+				$strBuffer .= '<br>' . "\n";
 			}
-
-			$strBuffer .= "\n";
 		}
 
 		return $strBuffer;
