@@ -18,6 +18,14 @@
 	font-family: Courier, monospace;
 }
 
+.dca a {
+	text-decoration: none;
+}
+
+.dca a:hover {
+	text-decoration: underline;
+}
+
 .dca .string {
 	color: #008200;
 }
