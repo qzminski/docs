@@ -101,21 +101,12 @@ class Parser
 	 */
 	public function run()
 	{
-		$strBuffer = '<html>
-<head>
-<style>
-body { font-family: courier; }
-</style>
-</head>
-<body>
-<span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
+		$strBuffer = '<span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
 (<br><br>'
 . $this->generateMarkup($GLOBALS['TL_DCA']['tl_table'], 1) .
-');
-</body>
-</html>';
+');';
 
-		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.html', 'w');
+		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.md', 'w');
 		fwrite($resFile, $strBuffer);
 		fclose($resFile);
 	}
@@ -151,13 +142,23 @@ body { font-family: courier; }
 				$strTitle = '';
 				$strTrail = implode('.', $trail);
 
-				// Get the language title
-				if (isset($GLOBALS['TL_LANG']['tl_table'][$strTrail]))
+				// Get the title
+				if (isset($GLOBALS['TL_LANG']['tl_table'][$strTrail][0]))
 				{
-					$strTitle = htmlspecialchars($GLOBALS['TL_LANG']['tl_table'][$strTrail]);
+					$strTitle = htmlspecialchars($GLOBALS['TL_LANG']['tl_table'][$strTrail][0]);
 				}
 
-				$strBuffer .= '<a href="#" class="string" title="' . $strTitle . '">\'' . $k . '\'</a>&nbsp;=&gt;&nbsp;';
+				// Generate a link or span
+				if (isset($GLOBALS['TL_LANG']['tl_table'][$strTrail][1]))
+				{
+					$strBuffer .= '<a href="' . $GLOBALS['TL_LANG']['tl_table'][$strTrail][1] . '" class="string"' . ($strTitle ? ' title="'.$strTitle : '') . '">\'' . $k . '\'</a>';
+				}
+				else
+				{
+					$strBuffer .= '<span class="string"' . ($strTitle ? ' title="'.$strTitle : '') . '">\'' . $k . '\'</span>';
+				}
+
+				$strBuffer .= '&nbsp;=&gt;&nbsp;';
 			}
 
 			$strBuffer .= $this->generateValue($v, ($k === 'sql'));
@@ -187,6 +188,8 @@ body { font-family: courier; }
 			{
 				$strBuffer .= '<br>';
 			}
+
+			$strBuffer .= "\n";
 		}
 
 		return $strBuffer;
