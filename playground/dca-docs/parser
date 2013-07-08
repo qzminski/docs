@@ -1,0 +1,284 @@
+#!/usr/bin/php -q
+
+<?php
+
+@define('SCRIPT_ROOT', dirname(__FILE__));
+
+// Report all errors
+error_reporting(E_ALL);
+
+
+/**
+ * Class Parser
+ *
+ * Provides methods to parse nad generate the DCA documentation
+ * @author Kamil Kuzminski <kamil.kuzminski@codefog.pl>
+ */
+class Parser
+{
+
+	/**
+	 * Source
+	 * @var string
+	 */
+	protected $strSource;
+
+	/**
+	 * Language
+	 * @var string
+	 */
+	protected $strLanguage = 'en';
+
+	/**
+	 * Indent size
+	 * @var integer
+	 */
+	protected $intIndentSize = 4;
+
+	/**
+	 * Non-associative arrays that should be formatted
+	 * as the associative ones
+	 * @var array
+	 */
+	protected $arrPreserveArrays = array
+	(
+		'onload_callback',
+		'onsubmit_callback',
+		'ondelete_callback',
+		'oncut_callback',
+		'oncopy_callback',
+		'load_callback',
+		'save_callback'
+	);
+
+
+	/**
+	 * Initialize the parser
+	 * @param string
+	 * @param language
+	 */
+	public function __construct($strSource, $strLanguage='en')
+	{
+		if (!$strSource)
+		{
+			die('Please provide the source!');
+		}
+
+		$this->strSource = $strSource;
+
+		// Die if there is no source file
+		if (!is_file(SCRIPT_ROOT . '/src/' . $this->strSource . '.php'))
+		{
+			die('No source file found for ' . $this->strSource);
+		}
+
+		include(SCRIPT_ROOT . '/src/' . $this->strSource . '.php');
+
+		// Die if the source code is invalid
+		if (!isset($GLOBALS['TL_DCA']['tl_table']))
+		{
+			die('The source file is invalid!');
+		}
+
+		// Override the default language
+		if ($strLanguage != '')
+		{
+			$this->strLanguage = strtolower($strLanguage);
+		}
+
+		// Die if there is no language file
+		if (!is_file(SCRIPT_ROOT . '/languages/' . $this->strLanguage . '.php'))
+		{
+			die('No language file found for ' . $this->strLanguage);
+		}
+
+		include(SCRIPT_ROOT . '/languages/' . $this->strLanguage . '.php');
+	}
+
+
+	/**
+	 * Run the parser
+	 */
+	public function run()
+	{
+		$strBuffer = '<html>
+<head>
+<style>
+body { font-family: courier; }
+</style>
+</head>
+<body>
+<span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
+(<br><br>'
+. $this->generateMarkup($GLOBALS['TL_DCA']['tl_table'], 1) .
+');
+</body>
+</html>';
+
+		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.html', 'w');
+		fwrite($resFile, $strBuffer);
+		fclose($resFile);
+	}
+
+
+	/**
+	 * Recursively parse the array and generate the markup
+	 * @param array
+	 * @param integer
+	 * @param array
+	 * @return string
+	 */
+	protected function generateMarkup($arrArray, $intIndent, $arrTrail=array())
+	{
+		$strBuffer = '';
+		$count = 0;
+		$total = count(array_filter($arrArray));
+
+		foreach ($arrArray as $k=>$v)
+		{
+			// Add the top levels comments
+			if ($intIndent == 1)
+			{
+				$strBuffer .= $this->generateIndent($intIndent) . '<span class="comment">// ' . ucfirst($k) . '</span><br>';
+			}
+
+			$trail = array_merge($arrTrail, array($k));
+			$strBuffer .= $this->generateIndent($intIndent);
+
+			// Add the key
+			if (is_string($k))
+			{
+				$strTitle = '';
+				$strTrail = implode('.', $trail);
+
+				// Get the language title
+				if (isset($GLOBALS['TL_LANG']['tl_table'][$strTrail]))
+				{
+					$strTitle = htmlspecialchars($GLOBALS['TL_LANG']['tl_table'][$strTrail]);
+				}
+
+				$strBuffer .= '<a href="#" class="string" title="' . $strTitle . '">\'' . $k . '\'</a>&nbsp;=&gt;&nbsp;';
+			}
+
+			$strBuffer .= $this->generateValue($v, ($k === 'sql'));
+
+			// Generate array
+			if (is_array($v))
+			{
+				// Associative arrays
+				if ($k && (count(array_filter(array_keys($v), 'is_string')) > 0 || in_array($k, $this->arrPreserveArrays)))
+				{
+					$strBuffer .= '<br>';
+					$strBuffer .= $this->generateIndent($intIndent) . '(<br>';
+					$strBuffer .= $this->generateMarkup($v, ($intIndent + 1), $trail);
+					$strBuffer .= $this->generateIndent($intIndent) . ')';
+				}
+				// Non-associative arrays
+				else
+				{
+					$strBuffer .= '(\'' . implode('\', \'', $v) . '\')';
+				}
+			}
+
+			$strBuffer .= ((++$count == $total) ? '' : ',') . '<br>';
+
+			// Separate the main sections
+			if ($intIndent == 1)
+			{
+				$strBuffer .= '<br>';
+			}
+		}
+
+		return $strBuffer;
+	}
+
+
+	/**
+	 * Detect a value type and wrap it with markup
+	 * @param mixed
+	 * @param boolean
+	 * @return string
+	 */
+	protected function generateValue($varValue, $blnSpecial=false)
+	{
+		$strBuffer = '';
+		$strType = gettype($varValue);
+		$class = strtolower(str_replace('_', ' ', $strType));
+
+		switch ($strType)
+		{
+			case 'boolean':
+				$strBuffer = '<span class="' . $class . '">' . ($varValue ? 'true' : 'false') . '</span>';
+				break;
+
+			case 'integer':
+			case 'double':
+				$strBuffer = '<span class="' . $class . '">' . $varValue . '</span>';
+				break;
+
+			case 'string':
+				// The $GLOBALS variable
+				if (strpos($varValue, '$GLOBALS') !== false)
+				{
+					preg_match_all('{\[(\'?[^\'\]]+\'?)\]}', $varValue, $matches);
+
+					if (is_array($matches) && !empty($matches))
+					{
+						foreach ($matches[1] as $k=>$v)
+						{
+							$varValue = str_replace($v, $this->generateValue(str_replace("'", '', $v)), $varValue);
+						}
+					}
+				}
+
+				// Variables
+				if (preg_match('/\$[a-zA-Z0-9_]+/', $varValue))
+				{
+					$strBuffer = preg_replace('/\$[a-zA-Z0-9_]+/', '<span class="variable">$0</span>', $varValue);
+					break;
+				}
+
+				$varValue = htmlspecialchars($varValue);
+
+				// Double quotes
+				if ($blnSpecial)
+				{
+					$strBuffer = '<span class="' . $class . '">"' . $varValue . '"</span>';
+				}
+				// Regular quotes
+				else
+				{
+					$strBuffer = '<span class="' . $class . '">\'' . $varValue . '\'</span>';
+				}
+				break;
+
+			case 'array':
+				$strBuffer = '<span class="' . $class . '">array</span>';
+				break;
+		}
+
+		return $strBuffer;
+	}
+
+
+	/**
+	 * Generate indent
+	 * @param integer
+	 * @return string
+	 */
+	protected function generateIndent($intIndent)
+	{
+		return str_repeat('&nbsp;', ($intIndent * $this->intIndentSize));
+	}
+}
+
+$strSource = isset($argv[1]) ? $argv[1] : null;
+$strLanguage = isset($argv[2]) ? $argv[2] : null;
+
+/**
+ * Run the parser
+ */
+$objParser = new Parser($strSource, $strLanguage);
+$objParser->run();
+
+?>
