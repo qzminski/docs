@@ -101,14 +101,28 @@ class Parser
 	 */
 	public function run()
 	{
-		$strBuffer = '<div style="font-family:Courier;">
+		$strBuffer = '<html>
+<head>
+<link rel="stylesheet" type="text/css" href="https://github.com/qzminski/docs/blob/feature/dca-docs/playground/dca-docs/en/assets/theme.css">
+<script src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
+<script src="https://contao.org/assets/mootools/core/1.4.5/mootools-more.js"></script>
+<script>
+window.addEvent("domready", function(){
+  new Tips($$("[title]"));
+});
+</script>
+</head>
+<body>
+<div class="dca">
 <span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
 (<br><br>'
 . $this->generateMarkup($GLOBALS['TL_DCA']['tl_table'], 1) .
 ');
-</div>';
+</div>
+</body>
+</html>';
 
-		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.md', 'w');
+		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.html', 'w');
 		fwrite($resFile, $strBuffer);
 		fclose($resFile);
 	}
@@ -132,7 +146,7 @@ class Parser
 			// Add the top levels comments
 			if ($intIndent == 1)
 			{
-				$strBuffer .= $this->generateIndent($intIndent) . '<span class="comment">// ' . ucfirst($k) . '</span><br>' . "\n";
+				$strBuffer .= $this->generateIndent($intIndent) . '<span class="comments">// ' . ucfirst($k) . '</span><br>' . "\n";
 			}
 
 			$trail = array_merge($arrTrail, array($k));
@@ -256,7 +270,7 @@ class Parser
 				break;
 
 			case 'array':
-				$strBuffer = '<span class="' . $class . '">array</span>';
+				$strBuffer = '<span class="keyword">array</span>';
 				break;
 		}
 

@@ -1,0 +1,37 @@
+.tip-wrap {
+	color: #ffffff;
+	background-color: #000000;
+	opacity: 0.8;
+	width: 200px;
+	z-index: 13000;
+}
+
+.tip-text {
+	font-size: 11px;
+	padding: 4px 8px 8px;
+}
+
+.dca {
+	font-family: Courier, monospace;
+}
+
+.dca .string {
+	color: blue;
+}
+
+.dca .comments {
+	color: #008200;
+}
+
+.dca .variable {
+	color: #aa7700;
+}
+
+.dca .integer,
+.dca .double {
+	color: #009900;
+}
+
+.dca .keywords {
+	color: #006699;
+}
