@@ -36,6 +36,12 @@ class Parser
 	protected $intIndentSize = 4;
 
 	/**
+	 * Column size
+	 * @var integer
+	 */
+	protected $intColumnSize = 30;
+
+	/**
 	 * Non-associative arrays that should be formatted
 	 * as the associative ones
 	 * @var array
@@ -116,7 +122,7 @@ window.addEvent("domready", function(){
 <div class="dca">
 <span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
 (<br><br>'
-. $this->generateMarkup($GLOBALS['TL_DCA']['tl_table'], 1) .
+. $this->generateMarkup($GLOBALS['TL_DCA']['tl_table']) .
 ');
 </div>
 </body>
@@ -135,7 +141,7 @@ window.addEvent("domready", function(){
 	 * @param array
 	 * @return string
 	 */
-	protected function generateMarkup($arrArray, $intIndent, $arrTrail=array())
+	protected function generateMarkup($arrArray, $intIndent=1, $arrTrail=array())
 	{
 		$strBuffer = '';
 		$count = 0;
@@ -174,6 +180,46 @@ window.addEvent("domready", function(){
 					$strBuffer .= '<span class="string"' . ($strTitle ? ' title="'.$strTitle : '') . '">\'' . $k . '\'</span>';
 				}
 
+				$blnPadding = true;
+
+				// Do not add padding on top level sections
+				if ($intIndent == 1)
+				{
+					$blnPadding = false;
+				}
+
+				// Do not add padding for preserved array
+				if (in_array($k, $this->arrPreserveArrays))
+				{
+					$blnPadding = false;
+				}
+
+				// Do not add padding for "config" particular cases
+				if (in_array('config', $arrTrail) && ($k == 'sql' || $intIndent > 2))
+				{
+					$blnPadding = false;
+				}
+
+				// Do not add padding for "list" particular cases
+				if (in_array('list', $arrTrail) && $intIndent == 2)
+				{
+					$blnPadding = false;
+				}
+
+				// Do not add padding for "fields" particular cases
+				if (in_array('fields', $arrTrail) && $intIndent == 2)
+				{
+					$blnPadding = false;
+				}
+
+				// Add padding to make the columns equal
+				if ($blnPadding)
+				{
+					$intPadding = $this->intColumnSize - strlen($k);
+					$intPadding = $intPadding - (($intIndent - 3) * $this->intIndentSize);
+					$strBuffer .= str_repeat('&nbsp;', ($intPadding - 1));
+				}
+
 				$strBuffer .= '&nbsp;=&gt;&nbsp;';
 			}
 
@@ -193,7 +239,14 @@ window.addEvent("domready", function(){
 				// Non-associative arrays
 				else
 				{
-					$strBuffer .= '(\'' . implode('\', \'', $v) . '\')';
+					$values = array();
+
+					foreach ($v as $vv)
+					{
+						$values[] = $this->generateValue($vv);
+					}
+
+					$strBuffer .= '(' . implode(', ', $values) . ')';
 				}
 			}
 
