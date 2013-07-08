@@ -287,6 +287,21 @@ window.addEvent("domready", function(){
 				break;
 
 			case 'string':
+				// Parse concatenated strings
+				if (strpos($varValue, ' . ') !== false)
+				{
+					$values = explode(' . ', $varValue);
+
+					// Convert the values
+					foreach ($values as $k=>$v)
+					{
+						$values[$k] = $this->generateValue($v);
+					}
+
+					$strBuffer = implode($values, ' . ');
+					break;
+				}
+
 				// The $GLOBALS variable
 				if (strpos($varValue, '$GLOBALS') !== false)
 				{
@@ -308,17 +323,15 @@ window.addEvent("domready", function(){
 					break;
 				}
 
-				$varValue = htmlspecialchars($varValue);
-
 				// Double quotes
 				if ($blnSpecial)
 				{
-					$strBuffer = '<span class="' . $class . '">"' . $varValue . '"</span>';
+					$strBuffer = '<span class="' . $class . '">"' . htmlspecialchars(str_replace('"', '\"', $varValue)) . '"</span>';
 				}
 				// Regular quotes
 				else
 				{
-					$strBuffer = '<span class="' . $class . '">\'' . $varValue . '\'</span>';
+					$strBuffer = '<span class="' . $class . '">\'' . htmlspecialchars(str_replace("'", "\'", $varValue)) . '\'</span>';
 				}
 				break;
 
