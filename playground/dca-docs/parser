@@ -101,10 +101,12 @@ class Parser
 	 */
 	public function run()
 	{
-		$strBuffer = '<span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
+		$strBuffer = '<div style="font-family:Courier;">
+<span class="variable">$GLOBALS</span>['.$this->generateValue('TL_DCA').']['.$this->generateValue('tl_table').']&nbsp;=>&nbsp;'.$this->generateValue(array()).'<br>
 (<br><br>'
 . $this->generateMarkup($GLOBALS['TL_DCA']['tl_table'], 1) .
-');';
+');
+</div>';
 
 		$resFile = fopen(SCRIPT_ROOT . '/' . $this->strLanguage . '/' . $this->strSource . '.md', 'w');
 		fwrite($resFile, $strBuffer);

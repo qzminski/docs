@@ -1,3 +1,4 @@
+<div style="font-family:Courier;">
 <span class="variable">$GLOBALS</span>[<span class="string">'TL_DCA'</span>][<span class="string">'tl_table'</span>]&nbsp;=>&nbsp;<span class="array">array</span><br>
 (<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// Config</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="http://contao.org" class="string" title="Data container configuration">'config'</a>&nbsp;=&gt;&nbsp;<span class="array">array</span><br>&nbsp;&nbsp;&nbsp;&nbsp;(<br>
@@ -98,3 +99,4 @@
 &nbsp;&nbsp;&nbsp;&nbsp;)<br>
 <br>
 );
+</div>
