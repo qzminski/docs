@@ -11,8 +11,9 @@ error_reporting(E_ALL);
 /**
  * Class Parser
  *
- * Provides methods to parse nad generate the DCA documentation
+ * Provides methods to parse and generate the DCA documentation
  * @author Kamil Kuzminski <kamil.kuzminski@codefog.pl>
+ * @author Andreas Schempp <andreas.schempp@terminal42.ch>
  */
 class Parser
 {
@@ -109,7 +110,7 @@ class Parser
 	{
 		$strBuffer = '<html>
 <head>
-<link rel="stylesheet" type="text/css" href="https://raw.github.com/qzminski/docs/feature/dca-docs/playground/dca-docs/assets/style.css">
+<link rel="stylesheet" type="text/css" href="../assets/style.css">
 <script src="http://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
 <script src="https://contao.org/assets/mootools/core/1.4.5/mootools-more.js"></script>
 <script>
