@@ -29,7 +29,8 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         (
             'keys' => array
             (
-                'id' => 'primary'
+                'id' => 'primary',
+                'pid' => 'index'
             )
         )
     ),
@@ -39,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     (
         'sorting' => array
         (
-            'mode'                      => 1,
+            'mode'                      => 3,
             'fields'                    => array('title', 'date'),
             'flag'                      => 1,
             'panelLayout'               => 'filter;search,limit'
@@ -104,6 +105,10 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         'id' => array
         (
             'sql'                       => "int(10) unsigned NOT NULL auto_increment"
+        ),
+        'pid' => array
+        (
+            'sql'                       => "int(10) unsigned NOT NULL default '0'",
         ),
         'tstamp' => array
         (

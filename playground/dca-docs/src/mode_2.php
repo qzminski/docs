@@ -39,7 +39,7 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     (
         'sorting' => array
         (
-            'mode'                      => 1,
+            'mode'                      => 2,
             'fields'                    => array('title', 'date'),
             'flag'                      => 1,
             'panelLayout'               => 'filter;search,limit'

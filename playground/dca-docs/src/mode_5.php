@@ -10,6 +10,7 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     'config' => array
     (
         'dataContainer'                 => 'Table',
+        'label'                         => &$GLOBALS['TL_LANG']['MOD']['mymodule'][0],
         'ctable'                        => array('tl_child'),
         'enableVersioning'              => true,
         'switchToEdit'                  => true,
@@ -29,7 +30,8 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         (
             'keys' => array
             (
-                'id' => 'primary'
+                'id' => 'primary',
+                'pid' => 'index'
             )
         )
     ),
@@ -39,10 +41,11 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     (
         'sorting' => array
         (
-            'mode'                      => 1,
+            'mode'                      => 5,
             'fields'                    => array('title', 'date'),
             'flag'                      => 1,
-            'panelLayout'               => 'filter;search,limit'
+            'panelLayout'               => 'filter;search,limit',
+            'icon'                      => 'system/modules/inserttags/html/icon.gif',
         ),
         'label' => array
         (
@@ -104,6 +107,10 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         'id' => array
         (
             'sql'                       => "int(10) unsigned NOT NULL auto_increment"
+        ),
+        'pid' => array
+        (
+            'sql'                       => "int(10) unsigned NOT NULL default '0'",
         ),
         'tstamp' => array
         (

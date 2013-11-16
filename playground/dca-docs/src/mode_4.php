@@ -10,6 +10,7 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     'config' => array
     (
         'dataContainer'                 => 'Table',
+        'ptable'                        => 'tl_parent',
         'ctable'                        => array('tl_child'),
         'enableVersioning'              => true,
         'switchToEdit'                  => true,
@@ -29,7 +30,8 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         (
             'keys' => array
             (
-                'id' => 'primary'
+                'id' => 'primary',
+                'pid' => 'index'
             )
         )
     ),
@@ -39,18 +41,14 @@ $GLOBALS['TL_DCA']['tl_table'] = array
     (
         'sorting' => array
         (
-            'mode'                      => 1,
+            'mode'                      => 4,
             'fields'                    => array('title', 'date'),
             'flag'                      => 1,
-            'panelLayout'               => 'filter;search,limit'
-        ),
-        'label' => array
-        (
-            'fields'                    => array('title'),
-            'format'                    => '%s',
-            'maxCharacters'             => 100,
-            'showColumns'               => true,
-            'label_callback'            => array('%TABLE%', 'addIcon'),
+            'panelLayout'               => 'filter;search,limit',
+            'headerFields'              => array('name'),
+            'disableGrouping'           => true,
+            'child_record_callback'     => array('tl_table', 'listRows'),
+            'paste_button_callback'     => array('tl_table', 'pasteTag'),
         ),
         'global_operations' => array
         (
@@ -104,6 +102,10 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         'id' => array
         (
             'sql'                       => "int(10) unsigned NOT NULL auto_increment"
+        ),
+        'pid' => array
+        (
+            'sql'                       => "int(10) unsigned NOT NULL default '0'",
         ),
         'tstamp' => array
         (
