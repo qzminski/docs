@@ -17,14 +17,29 @@ $GLOBALS['TL_DCA']['tl_table'] = array
         'closed'                        => true,
         'notEditable'                   => true,
         'notCopyable'                   => true,
+        'notSortable'                   => true,
         'notDeletable'                  => true,
+        'doNotCopyRecords'              => true,
+        'doNotDeleteRecords'            => true,
         'onload_callback' => array
         (
-            array('tl_table', 'testMethod')
+            array('tl_table', 'myLoadMethod')
         ),
         'onsubmit_callback' => array
         (
-            array('tl_table', 'testMethod')
+            array('tl_table', 'mySubmitMethod')
+        ),
+        'ondelete_callback' => array
+        (
+            array('tl_table', 'myDeleteMethod')
+        ),
+        'oncut_callback' => array
+        (
+            array('tl_table', 'myCutMethod'),
+        ),
+        'oncopy_callback' => array
+        (
+            array('tl_table', 'myCopyMethod'),
         ),
         'sql' => array
         (
