@@ -205,7 +205,11 @@ order and you can add custom labels.
       <b>filter</b> show the filter records menu<br>
       <b>limit</b> show the limit records menu.<br>
       <br>Separate options with comma (= space) and semicolon (= new line)
-      like <code>sort,filter;search,limit</code>.</td>
+      like <code>sort,filter;search,limit</code>.<br>
+      <br>To split filters into groups simply add them multiple times,
+      e.g. <code>filter;filter;filter;search,limit</code> and set the correct
+      filter index in the field configuration (starts from 1), for example
+      <code>'filter' => 2</code>.</td>
 </tr>
 <tr>
   <td>fields</td>
@@ -436,9 +440,9 @@ filter criteria.
 </tr>
 <tr>
   <td>filter</td>
-  <td>true/false (<code>boolean</code>)</td>
+  <td>true/false (<code>boolean</code> or <code>integer</code>)</td>
   <td>If true the field will be included in the filter menu (see "sorting
-      records" -> "panelLayout").</td>
+      records" -> "panelLayout"). Set the integer to define the filter group index.</td>
 </tr>
 <tr>
   <td>flag</td>
